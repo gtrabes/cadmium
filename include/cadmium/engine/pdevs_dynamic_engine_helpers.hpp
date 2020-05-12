@@ -110,13 +110,13 @@ namespace cadmium {
 
             #ifdef CADMIUM_EXECUTE_CONCURRENT
             template<typename TIME>
-            void advance_simulation_in_subengines(TIME t, subcoordinators_type<TIME>& subcoordinators, boost::basic_thread_pool* threadpool) {
+            void advance_simulation_in_subengines(TIME t, subcoordinators_type<TIME>& subcoordinators, boost::basic_thread_pool* threadpool, int thread_number) {
                 auto advance_time= [&t](auto &c)->void { c->advance_simulation(t); };
 
                 if (threadpool == nullptr) {
                     std::for_each(subcoordinators.begin(), subcoordinators.end(), advance_time);
                 } else {
-                    cadmium::concurrency::concurrent_for_each(*threadpool, subcoordinators.begin(),
+                    cadmium::concurrency::concurrent_for_each(*threadpool, thread_number, subcoordinators.begin(),
                                                          subcoordinators.end(), advance_time);
                 }
             }
@@ -130,12 +130,12 @@ namespace cadmium {
 
             #ifdef CADMIUM_EXECUTE_CONCURRENT
             template<typename TIME>
-            void collect_outputs_in_subcoordinators(TIME t, subcoordinators_type<TIME>& subcoordinators, boost::basic_thread_pool* threadpool) {
+            void collect_outputs_in_subcoordinators(TIME t, subcoordinators_type<TIME>& subcoordinators, boost::basic_thread_pool* threadpool, int thread_number) {
                 auto collect_output = [&t](auto & c)->void { c->collect_outputs(t); };
                 if (threadpool == nullptr) {
                     std::for_each(subcoordinators.begin(), subcoordinators.end(), collect_output);
                 } else {
-                    cadmium::concurrency::concurrent_for_each(*threadpool, subcoordinators.begin(),
+                    cadmium::concurrency::concurrent_for_each(*threadpool, thread_number, subcoordinators.begin(),
                                                          subcoordinators.end(), collect_output);
                 }
             }

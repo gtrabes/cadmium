@@ -43,7 +43,7 @@ namespace cadmium {
 
 
         template<typename ITERATOR, typename FUNC>
-        void concurrent_for_each(boost::basic_thread_pool& threadpool, ITERATOR first, ITERATOR last, FUNC& f) {
+        void concurrent_for_each(boost::basic_thread_pool& threadpool, int thread_number, ITERATOR first, ITERATOR last, FUNC& f) {
           std::vector<std::future<void> > task_statuses;
 
           for (ITERATOR it = first; it != last; it++) {

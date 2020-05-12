@@ -230,7 +230,7 @@ namespace cadmium {
 
                         // Fill all outboxes and clean the inboxes in the lower levels recursively
                         #ifdef CADMIUM_EXECUTE_CONCURRENT
-                        cadmium::dynamic::engine::collect_outputs_in_subcoordinators<TIME>(t, _subcoordinators, _threadpool);
+                        cadmium::dynamic::engine::collect_outputs_in_subcoordinators<TIME>(t, _subcoordinators, _threadpool, thread_number);
                         #else
                         cadmium::dynamic::engine::collect_outputs_in_subcoordinators<TIME>(t, _subcoordinators);
                         #endif
@@ -278,7 +278,7 @@ namespace cadmium {
 
                         //recurse on advance_simulation
                         #ifdef CADMIUM_EXECUTE_CONCURRENT
-                        cadmium::dynamic::engine::advance_simulation_in_subengines<TIME>(t, _subcoordinators, _threadpool);
+                        cadmium::dynamic::engine::advance_simulation_in_subengines<TIME>(t, _subcoordinators, _threadpool, thread_number);
                         #else
                         cadmium::dynamic::engine::advance_simulation_in_subengines<TIME>(t, _subcoordinators);
                         #endif
