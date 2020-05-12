@@ -40,6 +40,8 @@ namespace cadmium {
          * for_each that runs using a thread_pool (assumed without running tasks),
          * and waits por all tasks to finish until it returns
          */
+
+
         template<typename ITERATOR, typename FUNC>
         void concurrent_for_each(boost::basic_thread_pool& threadpool, ITERATOR first, ITERATOR last, FUNC& f) {
           std::vector<std::future<void> > task_statuses;
@@ -57,6 +59,23 @@ namespace cadmium {
           }
           //when concurrent_for_each end threadpool queue is empty
         }
+
+
+    /*
+    	template<class T, typename Function>
+    	void concurrent_for_each(boost::basic_thread_pool& threadpool, ITERATOR first, ITERATOR last, FUNC& f) {
+    		int size = obj.size();
+*/
+    		/* set number of threads */
+/*
+    		omp_set_num_threads(thread_number);
+
+			#pragma omp parallel for private(f) shared(obj)
+    			for (int i = 0; i < size; i++) {
+    				f(obj[i]);
+    			}
+    	}
+*/
 
 
     }

@@ -55,6 +55,7 @@ namespace cadmium {
 
                 #ifdef CADMIUM_EXECUTE_CONCURRENT
                 boost::basic_thread_pool* _threadpool;
+                int thread_number;
                 #endif //CADMIUM_EXECUTE_CONCURRENT
 
             public:
@@ -180,7 +181,7 @@ namespace cadmium {
                     //init all subcoordinators and find next transition time.
 
                     #ifdef CADMIUM_EXECUTE_CONCURRENT
-                    cadmium::dynamic::engine::init_subcoordinators<TIME>(initial_time, _subcoordinators, _threadpool);
+                    cadmium::dynamic::engine::init_subcoordinators<TIME>(initial_time, _subcoordinators, _threadpool, thread_number);
                     #else
                     cadmium::dynamic::engine::init_subcoordinators<TIME>(initial_time, _subcoordinators);
                     #endif //CADMIUM_EXECUTE_CONCURRENT
@@ -191,8 +192,9 @@ namespace cadmium {
 
                 #ifdef CADMIUM_EXECUTE_CONCURRENT
 
-                void init(TIME initial_time, boost::basic_thread_pool* threadpool) {
+                void init(TIME initial_time, boost::basic_thread_pool* threadpool, int thread_count) {
                     _threadpool = threadpool;
+                    thread_number = thread_count;
                     this->init(initial_time);
                 }
 

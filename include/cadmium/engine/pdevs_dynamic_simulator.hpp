@@ -74,7 +74,7 @@ namespace cadmium {
                 }
 
                 #ifdef CADMIUM_EXECUTE_CONCURRENT
-                void init(TIME initial_time, boost::basic_thread_pool* threadpool) {
+                void init(TIME initial_time, boost::basic_thread_pool* threadpool, int thread_number) {
                     this->init(initial_time);
                 }
                 #endif //CADMIUM_EXECUTE_CONCURRENT

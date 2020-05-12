@@ -74,7 +74,7 @@ namespace cadmium {
                   _threadpool(thread_count){
                     LOGGER::template log<cadmium::logger::logger_global_time, cadmium::logger::run_global_time>(init_time);
                     LOGGER::template log<cadmium::logger::logger_info, cadmium::logger::run_info>("Preparing model");
-                    _top_coordinator.init(init_time, &_threadpool);
+                    _top_coordinator.init(init_time, &_threadpool, thread_count);
                     _next = _top_coordinator.next();
                 }
 
