@@ -119,7 +119,9 @@ namespace cadmium {
 //                    cadmium::concurrency::concurrent_for_each(*threadpool, thread_number, subcoordinators.begin(),
 //                                                         subcoordinators.end(), advance_time);
 
-                    cadmium::concurrency::parallel_for_each(thread_number, subcoordinators, advance_time);
+//                    cadmium::concurrency::parallel_for_each(thread_number, subcoordinators, advance_time);
+                	cadmium::concurrency::omp_for_each(thread_number, subcoordinators.begin(), subcoordinators.end(), advance_time);
+
                 }
             }
             #else
@@ -139,7 +141,8 @@ namespace cadmium {
                 } else {
 //                    cadmium::concurrency::concurrent_for_each(*threadpool, thread_number, subcoordinators.begin(),
 //                                                         subcoordinators.end(), collect_output);
-                    cadmium::concurrency::parallel_for_each(thread_number, subcoordinators, collect_output);
+//                    cadmium::concurrency::parallel_for_each(thread_number, subcoordinators, collect_output);
+                	cadmium::concurrency::omp_for_each(thread_number, subcoordinators.begin(), subcoordinators.end(), collect_output);
                 }
             }
             #else

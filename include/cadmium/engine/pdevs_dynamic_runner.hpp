@@ -69,7 +69,7 @@ namespace cadmium {
                  * @param init_time is the initial time of the simulation.
                  */
                 #ifdef CADMIUM_EXECUTE_CONCURRENT
-                explicit runner(std::shared_ptr<cadmium::dynamic::modeling::coupled<TIME>> coupled_model, const TIME &init_time, unsigned const thread_count = boost::thread::hardware_concurrency())
+                explicit runner(std::shared_ptr<cadmium::dynamic::modeling::coupled<TIME>> coupled_model, const TIME &init_time, unsigned const thread_count)
                 : _top_coordinator(coupled_model),
                   _threadpool(thread_count){
                     LOGGER::template log<cadmium::logger::logger_global_time, cadmium::logger::run_global_time>(init_time);

@@ -106,6 +106,14 @@ namespace cadmium {
     	}
 
 
+    	template< class InputIt, class UnaryFunction >
+    	void omp_for_each(int thread_number, InputIt first, InputIt last, UnaryFunction f) {
+    		#pragma omp parallel for num_threads(thread_number) schedule(static)
+    		for(InputIt iter = first; iter < last; ++iter) {
+    			f(*iter);
+    		}
+    	}
+
 
     }
 }
