@@ -116,8 +116,10 @@ namespace cadmium {
                 if (threadpool == nullptr) {
                     std::for_each(subcoordinators.begin(), subcoordinators.end(), advance_time);
                 } else {
-                    cadmium::concurrency::concurrent_for_each(*threadpool, thread_number, subcoordinators.begin(),
-                                                         subcoordinators.end(), advance_time);
+//                    cadmium::concurrency::concurrent_for_each(*threadpool, thread_number, subcoordinators.begin(),
+//                                                         subcoordinators.end(), advance_time);
+
+                    cadmium::concurrency::parallel_for_each(thread_number, subcoordinators, advance_time);
                 }
             }
             #else
@@ -135,8 +137,9 @@ namespace cadmium {
                 if (threadpool == nullptr) {
                     std::for_each(subcoordinators.begin(), subcoordinators.end(), collect_output);
                 } else {
-                    cadmium::concurrency::concurrent_for_each(*threadpool, thread_number, subcoordinators.begin(),
-                                                         subcoordinators.end(), collect_output);
+//                    cadmium::concurrency::concurrent_for_each(*threadpool, thread_number, subcoordinators.begin(),
+//                                                         subcoordinators.end(), collect_output);
+                    cadmium::concurrency::parallel_for_each(thread_number, subcoordinators, collect_output);
                 }
             }
             #else

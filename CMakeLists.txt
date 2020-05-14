@@ -24,7 +24,7 @@ add_library(Cadmium INTERFACE)
 
 include_directories(include ${Boost_INCLUDE_DIRS})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -fopenmp")
 
 # Check for standard to use
 check_cxx_compiler_flag(-std=c++17 HAVE_FLAG_STD_CXX17)

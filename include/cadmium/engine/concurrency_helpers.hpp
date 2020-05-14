@@ -66,9 +66,9 @@ namespace cadmium {
     	template<typename ITERATOR, typename FUNC>
     	void concurrent_for_each(boost::basic_thread_pool& threadpool, int thread_number, ITERATOR first, ITERATOR last, FUNC& f) {
 //    		int size = obj.size();
-
+    		const size_t n = std::distance(first, last);
     		/* set number of threads */
-//    		omp_set_num_threads(thread_number);
+    		omp_set_num_threads(thread_number);
 
 /*
 			#pragma omp parallel for private(f) shared(obj)
@@ -78,12 +78,31 @@ namespace cadmium {
 */
 
 
-//    		#pragma omp parallel for private(f) shared(it)
-    			for (ITERATOR it = first; it != last; it++) {
-    				f(*it);
+//    		#pragma omp parallel for firstprivate(f) shared(first,last)
+//    		for (ITERATOR it = first; it != last; it++) {
+//    			f(*it);
+//    		}
+
+			#pragma omp parallel for firstprivate(f)
+    			for(size_t i = 0; i < n; i++) {
+    				auto& elem = *(first + i);
+    				// do whatever you want with elem
+    				f(elem);
     			}
+    	}
 
 
+    	template<class T, class Function>
+    	void parallel_for_each(int thread_number, std::vector<T> & obj, Function f){
+    		/* set number of threads */
+    		omp_set_num_threads(thread_number);
+    		int size = obj.size();
+//    		double result;
+    		#pragma omp parallel for firstprivate(f) shared(obj)
+    			for (int i = 0; i < size; i++){
+    				f(obj[i]);
+    			}
+    	//	cout << "Aca parallel after loop" << result << '\n';
     	}
 
 
