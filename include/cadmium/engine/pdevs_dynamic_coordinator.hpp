@@ -186,7 +186,7 @@ namespace cadmium {
                     //init all subcoordinators and find next transition time.
 
                     #ifdef CADMIUM_EXECUTE_CONCURRENT
-                    cadmium::dynamic::engine::init_subcoordinators<TIME>(initial_time, _subcoordinators, _threadpool, thread_number);
+                    cadmium::dynamic::engine::init_subcoordinators<TIME>(initial_time, _subcoordinators, _threadpool);
                     #else
 						#ifdef CPU_PARALLEL
                     	cadmium::dynamic::engine::init_subcoordinators<TIME>(initial_time, _subcoordinators, thread_number);
@@ -249,7 +249,7 @@ namespace cadmium {
 
                         // Fill all outboxes and clean the inboxes in the lower levels recursively
                         #ifdef CADMIUM_EXECUTE_CONCURRENT
-                        cadmium::dynamic::engine::collect_outputs_in_subcoordinators<TIME>(t, _subcoordinators, _threadpool, thread_number);
+                        cadmium::dynamic::engine::collect_outputs_in_subcoordinators<TIME>(t, _subcoordinators, _threadpool);
                         #else
 							#ifdef CPU_PARALLEL
                         	cadmium::dynamic::engine::collect_outputs_in_subcoordinators<TIME>(t, _subcoordinators, thread_number);
@@ -301,7 +301,7 @@ namespace cadmium {
 
                         //recurse on advance_simulation
                         #ifdef CADMIUM_EXECUTE_CONCURRENT
-                        cadmium::dynamic::engine::advance_simulation_in_subengines<TIME>(t, _subcoordinators, _threadpool, thread_number);
+                        cadmium::dynamic::engine::advance_simulation_in_subengines<TIME>(t, _subcoordinators, _threadpool);
                         #else
 							#ifdef CPU_PARALLEL
                         	cadmium::dynamic::engine::advance_simulation_in_subengines<TIME>(t, _subcoordinators, thread_number);
