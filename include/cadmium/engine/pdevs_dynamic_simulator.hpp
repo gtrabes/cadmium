@@ -74,10 +74,18 @@ namespace cadmium {
                 }
 
                 #ifdef CADMIUM_EXECUTE_CONCURRENT
-                void init(TIME initial_time, boost::basic_thread_pool* threadpool, int thread_number) {
+                void init(TIME initial_time, boost::basic_thread_pool* threadpool) {
                     this->init(initial_time);
                 }
                 #endif //CADMIUM_EXECUTE_CONCURRENT
+
+
+				#ifdef CPU_PARALLEL
+                void init(TIME initial_time, int thread_count) {
+                    this->init(initial_time, thread_count);
+                }
+                #endif //CPU_PARALLEL
+
 
                 std::string get_model_id() const override {
                     return _model->get_id();

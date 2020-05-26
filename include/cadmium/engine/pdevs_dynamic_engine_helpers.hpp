@@ -161,7 +161,7 @@ namespace cadmium {
                 }
 				#else
             	template<typename TIME>
-            	void collect_output_in_subcoordinators(TIME t, subcoordinators_type<TIME>& subcoordinators) {
+            	void collect_outputs_in_subcoordinators(TIME t, subcoordinators_type<TIME>& subcoordinators) {
             		auto collect_output= [&t](auto &c)->void { c->collect_outputs(t); };
             		std::for_each(subcoordinators.begin(), subcoordinators.end(), collect_output);
             	}

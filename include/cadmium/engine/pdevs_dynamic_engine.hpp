@@ -49,7 +49,7 @@ namespace cadmium {
                 virtual void init(TIME initial_time) = 0;
 
                 #ifdef CADMIUM_EXECUTE_CONCURRENT
-                	virtual void init(TIME initial_time, boost::basic_thread_pool* threadpool, int thread_number) = 0;
+                	virtual void init(TIME initial_time, boost::basic_thread_pool* threadpool) = 0;
                 #endif
 
 				#ifdef CPU_PARALLEL
