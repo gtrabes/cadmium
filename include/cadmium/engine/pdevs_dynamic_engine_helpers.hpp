@@ -97,7 +97,7 @@ namespace cadmium {
             #ifdef CADMIUM_EXECUTE_CONCURRENT
             template<typename TIME>
             void init_subcoordinators(TIME t, subcoordinators_type<TIME>& subcoordinators, boost::basic_thread_pool* threadpool) {
-                auto init_coordinator = [&t, threadpool, thread_number](auto & c)->void { c->init(t, threadpool); };
+                auto init_coordinator = [&t, threadpool](auto & c)->void { c->init(t, threadpool); };
                 std::for_each(subcoordinators.begin(), subcoordinators.end(), init_coordinator);
             }
             #else
