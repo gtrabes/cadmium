@@ -95,7 +95,7 @@ namespace cadmium {
                 		_top_coordinator.init(init_time);
                 		_next = _top_coordinator.next();
                 	}
-//					#endif //CPU_PARALLEL
+					#endif //CPU_PARALLEL
                 #endif //CADMIUM_EXECUTE_CONCURRENT
                 
                 /**
