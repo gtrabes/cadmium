@@ -36,6 +36,11 @@
 #include <boost/thread/executors/basic_thread_pool.hpp>
 #endif //CADMIUM_EXECUTE_CONCURRENT
 
+#ifdef CPU_PARALLEL
+#include <cadmium/engine/parallel_helpers.hpp>
+#endif //CPU_PARALLEL
+
+
 namespace cadmium {
     namespace dynamic {
         namespace engine {
