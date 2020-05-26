@@ -138,7 +138,7 @@ namespace cadmium {
 
             #ifdef CADMIUM_EXECUTE_CONCURRENT
             template<typename TIME>
-            void collect_outputs_in_subcoordinators(TIME t, subcoordinators_type<TIME>& subcoordinators, boost::basic_thread_pool* threadpool, int thread_number) {
+            void collect_outputs_in_subcoordinators(TIME t, subcoordinators_type<TIME>& subcoordinators, boost::basic_thread_pool* threadpool) {
                 auto collect_output = [&t](auto & c)->void { c->collect_outputs(t); };
                 if (threadpool == nullptr) {
                     std::for_each(subcoordinators.begin(), subcoordinators.end(), collect_output);
