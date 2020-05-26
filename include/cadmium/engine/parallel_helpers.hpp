@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2019, Juan Lanuza
- * Carleton University, Universidad de Buenos Aires
+ * Copyright (c) 2020, Guillermo G. Trabes
+ * Carleton University, Universidad Nacional de San Luis
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,42 +24,37 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CADMIUM_CONCURRENCY_HELPERS_HPP
-#define CADMIUM_CONCURRENCY_HELPERS_HPP
+#ifndef CADMIUM_PARALLEL_HELPERS_HPP
+#define CADMIUM_PARALLEL_HELPERS_HPP
 
 #include <vector>
 #include <functional>
-#include <future>
 #include <chrono>
-
-#include <boost/thread/executors/basic_thread_pool.hpp>
+#include <omp.h>
 
 namespace cadmium {
-    namespace concurrency {
-        /*
-         * for_each that runs using a thread_pool (assumed without running tasks),
-         * and waits por all tasks to finish until it returns
-         */
-        template<typename ITERATOR, typename FUNC>
-        void concurrent_for_each(boost::basic_thread_pool& threadpool, ITERATOR first, ITERATOR last, FUNC& f) {
-          std::vector<std::future<void> > task_statuses;
+    namespace parallel {
 
-          for (ITERATOR it = first; it != last; it++) {
-              std::packaged_task<void()> task(std::bind<void>(f, *it));
-              task_statuses.push_back(task.get_future());
+    		template< class InputIt, class UnaryFunction >
+            void cpu_parallel_for_each(int thread_number, InputIt first, InputIt last, UnaryFunction& f) {
 
-              threadpool.submit(std::move(task));
-          }
-          auto future_ready = [](auto& f) -> bool { return f.wait_for(std::chrono::seconds(0)) == std::future_status::ready; };
-          while(! std::all_of(task_statuses.begin(), task_statuses.end(), future_ready) ){
-              // if there are tasks in the threadpool queue, the main thread executes one
-              threadpool.schedule_one_or_yield();
-          }
-          //when concurrent_for_each end threadpool queue is empty
-        }
+    			#pragma omp parallel firstprivate(f, first, last) num_threads(thread_number) proc_bind(close)
+    			{
+    				const size_t n = std::distance(first, last);
+    				int tid = omp_get_thread_num();
+    				size_t P = thread_number;
 
-
+    				if(tid!=P-1) {
+    					for(size_t r = (n/P) * tid; r < (n/P) * (tid+1) ; r++) {
+    						f(*(r+first));
+    					}
+    				} else {
+    					for(size_t r = (n/P) * tid; r < n ; r++) {
+    						f(*(r+first));
+    				}
+    			}
+    		}
     }
 }
 
-#endif //CADMIUM_CONCURRENCY_HELPERS_HPP
+#endif //CADMIUM_PARALLEL_HELPERS_HPP
