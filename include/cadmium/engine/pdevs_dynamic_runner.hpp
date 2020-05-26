@@ -79,15 +79,15 @@ namespace cadmium {
                 }
 
                 #else
-//					#ifdef CPU_PARALLEL
-//                	explicit runner(std::shared_ptr<cadmium::dynamic::modeling::coupled<TIME>> coupled_model, const TIME &init_time, unsigned const thread_count)
-//                	: _top_coordinator(coupled_model){
-//                		LOGGER::template log<cadmium::logger::logger_global_time, cadmium::logger::run_global_time>(init_time);
-//                		LOGGER::template log<cadmium::logger::logger_info, cadmium::logger::run_info>("Preparing model");
-//                		_top_coordinator.init(init_time, thread_count);
-//                		_next = _top_coordinator.next();
-//                	}
-//                	#else
+					#ifdef CPU_PARALLEL
+                	explicit runner(std::shared_ptr<cadmium::dynamic::modeling::coupled<TIME>> coupled_model, const TIME &init_time, unsigned const thread_count)
+                	: _top_coordinator(coupled_model){
+                		LOGGER::template log<cadmium::logger::logger_global_time, cadmium::logger::run_global_time>(init_time);
+                		LOGGER::template log<cadmium::logger::logger_info, cadmium::logger::run_info>("Preparing model");
+                		_top_coordinator.init(init_time, thread_count);
+                		_next = _top_coordinator.next();
+                	}
+                	#else
                 	explicit runner(std::shared_ptr<cadmium::dynamic::modeling::coupled<TIME>> coupled_model, const TIME &init_time)
                 	: _top_coordinator(coupled_model){
                 		LOGGER::template log<cadmium::logger::logger_global_time, cadmium::logger::run_global_time>(init_time);
