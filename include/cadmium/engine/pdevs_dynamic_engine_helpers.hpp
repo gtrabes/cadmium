@@ -103,8 +103,8 @@ namespace cadmium {
             #else
             template<typename TIME>
             void init_subcoordinators(TIME t, subcoordinators_type<TIME>& subcoordinators) {
-                auto init_coordinator = [&t](auto & c)->void { c->init(t); };
-                std::for_each(subcoordinators.begin(), subcoordinators.end(), init_coordinator);
+            	auto init_coordinator = [&t](auto & c)->void { c->init(t); };
+            	std::for_each(subcoordinators.begin(), subcoordinators.end(), init_coordinator);
             }
             #endif //CADMIUM_EXECUTE_CONCURRENT
 
@@ -116,20 +116,24 @@ namespace cadmium {
                 if (threadpool == nullptr) {
                     std::for_each(subcoordinators.begin(), subcoordinators.end(), advance_time);
                 } else {
-//                    cadmium::concurrency::concurrent_for_each(*threadpool, thread_number, subcoordinators.begin(),
-//                                                         subcoordinators.end(), advance_time);
-
-//                    cadmium::concurrency::parallel_for_each(thread_number, subcoordinators, advance_time);
-                	cadmium::concurrency::omp_for_each(thread_number, subcoordinators.begin(), subcoordinators.end(), advance_time);
-
+                    cadmium::concurrency::concurrent_for_each(*threadpool, thread_number, subcoordinators.begin(),
+                                                         subcoordinators.end(), advance_time);
                 }
             }
             #else
-            template<typename TIME>
-            void advance_simulation_in_subengines(TIME t, subcoordinators_type<TIME>& subcoordinators) {
-                auto advance_time= [&t](auto &c)->void { c->advance_simulation(t); };
-                std::for_each(subcoordinators.begin(), subcoordinators.end(), advance_time);
-            }
+				#ifdef CPU_PARALLEL
+            	template<typename TIME>
+                void advance_simulation_in_subengines(TIME t, subcoordinators_type<TIME>& subcoordinators, int thread_number) {
+            		auto advance_time= [&t](auto &c)->void { c->advance_simulation(t); };
+            		cpu_parallel_for_each(thread_number, subcoordinators.begin(), subcoordinators.end(), advance_time);
+                }
+				#else
+            	template<typename TIME>
+            	void advance_simulation_in_subengines(TIME t, subcoordinators_type<TIME>& subcoordinators) {
+            		auto advance_time= [&t](auto &c)->void { c->advance_simulation(t); };
+            		std::for_each(subcoordinators.begin(), subcoordinators.end(), advance_time);
+            	}
+				#endif //CPU_PARALLEL
             #endif //CADMIUM_EXECUTE_CONCURRENT
 
             #ifdef CADMIUM_EXECUTE_CONCURRENT
@@ -139,18 +143,24 @@ namespace cadmium {
                 if (threadpool == nullptr) {
                     std::for_each(subcoordinators.begin(), subcoordinators.end(), collect_output);
                 } else {
-//                    cadmium::concurrency::concurrent_for_each(*threadpool, thread_number, subcoordinators.begin(),
-//                                                         subcoordinators.end(), collect_output);
-//                    cadmium::concurrency::parallel_for_each(thread_number, subcoordinators, collect_output);
-                	cadmium::concurrency::omp_for_each(thread_number, subcoordinators.begin(), subcoordinators.end(), collect_output);
+                    cadmium::concurrency::concurrent_for_each(*threadpool, thread_number, subcoordinators.begin(),
+                                                         subcoordinators.end(), collect_output);
                 }
             }
             #else
-            template<typename TIME>
-            void collect_outputs_in_subcoordinators(TIME t, subcoordinators_type<TIME>& subcoordinators) {
-                auto collect_output = [&t](auto & c)->void { c->collect_outputs(t); };
-                std::for_each(subcoordinators.begin(), subcoordinators.end(), collect_output);
-            }
+				#ifdef CPU_PARALLEL
+            	template<typename TIME>
+                void collect_outputs_in_subcoordinators(TIME t, subcoordinators_type<TIME>& subcoordinators, int thread_number) {
+            		auto collect_output= [&t](auto &c)->void { c->collect_outputs(t); };
+            		cpu_parallel_for_each(thread_number, subcoordinators.begin(), subcoordinators.end(), collect_output);
+                }
+				#else
+            	template<typename TIME>
+            	void collect_output_in_subcoordinators(TIME t, subcoordinators_type<TIME>& subcoordinators) {
+            		auto collect_output= [&t](auto &c)->void { c->collect_outputs(t); };
+            		std::for_each(subcoordinators.begin(), subcoordinators.end(), collect_output);
+            	}
+				#endif //CPU_PARALLEL
             #endif //CADMIUM_EXECUTE_CONCURRENT
 
             template<typename TIME, typename LOGGER>
