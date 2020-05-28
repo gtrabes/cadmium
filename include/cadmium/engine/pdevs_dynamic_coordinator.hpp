@@ -55,13 +55,7 @@ namespace cadmium {
 
                 #ifdef CADMIUM_EXECUTE_CONCURRENT
                 boost::basic_thread_pool* _threadpool;
-                int thread_number;
                 #endif //CADMIUM_EXECUTE_CONCURRENT
-
-				#ifdef CPU_PARALLEL
-                int thread_number;
-                #endif //CPU_PARALLEL
-
 
             public:
 
@@ -188,11 +182,7 @@ namespace cadmium {
                     #ifdef CADMIUM_EXECUTE_CONCURRENT
                     cadmium::dynamic::engine::init_subcoordinators<TIME>(initial_time, _subcoordinators, _threadpool);
                     #else
-						#ifdef CPU_PARALLEL
-                    	cadmium::dynamic::engine::init_subcoordinators<TIME>(initial_time, _subcoordinators, thread_number);
-						#else
-                    	cadmium::dynamic::engine::init_subcoordinators<TIME>(initial_time, _subcoordinators);
-						#endif //CPU_PARALLEL
+                    cadmium::dynamic::engine::init_subcoordinators<TIME>(initial_time, _subcoordinators);
                     #endif //CADMIUM_EXECUTE_CONCURRENT
 
                     //find the one with the lowest next time
@@ -207,16 +197,6 @@ namespace cadmium {
                 }
 
                 #endif //CADMIUM_EXECUTE_CONCURRENT
-
-				#ifdef CPU_PARALLEL
-
-                void init(TIME initial_time, int thread_count) {
-                    thread_number = thread_count;
-                    this->init(initial_time);
-                }
-
-                #endif //CADMIUM_EXECUTE_CONCURRENT
-
 
                 std::string get_model_id() const override {
                     return _model_id;
@@ -250,12 +230,8 @@ namespace cadmium {
                         #ifdef CADMIUM_EXECUTE_CONCURRENT
                         cadmium::dynamic::engine::collect_outputs_in_subcoordinators<TIME>(t, _subcoordinators, _threadpool);
                         #else
-							#ifdef CPU_PARALLEL
-                        	cadmium::dynamic::engine::collect_outputs_in_subcoordinators<TIME>(t, _subcoordinators, thread_number);
-							#else
-                        	cadmium::dynamic::engine::collect_outputs_in_subcoordinators<TIME>(t, _subcoordinators);
-							#endif // CPU_PARALLEL
-						#endif // CADMIUM_EXECUTE_CONCURRENT
+                        cadmium::dynamic::engine::collect_outputs_in_subcoordinators<TIME>(t, _subcoordinators);
+                        #endif
 
                         // Use the EOC mapping to compose current level output
                         _outbox = cadmium::dynamic::engine::collect_messages_by_eoc<TIME, LOGGER>(_external_output_couplings);
@@ -302,11 +278,7 @@ namespace cadmium {
                         #ifdef CADMIUM_EXECUTE_CONCURRENT
                         cadmium::dynamic::engine::advance_simulation_in_subengines<TIME>(t, _subcoordinators, _threadpool);
                         #else
-							#ifdef CPU_PARALLEL
-                        	cadmium::dynamic::engine::advance_simulation_in_subengines<TIME>(t, _subcoordinators, thread_number);
-                        	#else
-                        	cadmium::dynamic::engine::advance_simulation_in_subengines<TIME>(t, _subcoordinators);
-							#endif
+                        cadmium::dynamic::engine::advance_simulation_in_subengines<TIME>(t, _subcoordinators);
                         #endif
 
                         //set _last and _next

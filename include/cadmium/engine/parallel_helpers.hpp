@@ -36,7 +36,7 @@ namespace cadmium {
     namespace parallel {
 
     		template< class InputIt, class UnaryFunction >
-            void cpu_parallel_for_each(int thread_number, InputIt first, InputIt last, UnaryFunction& f) {
+            void cpu_parallel_for_each(InputIt first, InputIt last, UnaryFunction& f, size_t thread_number = omp_get_num_threads()) {
 
     			#pragma omp parallel firstprivate(f, first, last) num_threads(thread_number) proc_bind(close)
     			{
@@ -51,7 +51,29 @@ namespace cadmium {
     				} else {
     					for(size_t r = (n/P) * tid; r < n ; r++) {
     						f(*(r+first));
+    					}
     				}
+    			}
+    		}
+
+    		template< class InputIt, class UnaryFunction >
+    		void cpu_parallel_for_each2(InputIt first, InputIt last, UnaryFunction& f) {
+
+				#pragma omp parallel firstprivate(f, first, last) proc_bind(close)
+    			{
+    				const size_t n = std::distance(first, last);
+    			    int tid = omp_get_thread_num();
+    			    size_t P = omp_get_num_threads();
+
+    			    if(tid!=P-1) {
+    			    	for(size_t r = (n/P) * tid; r < (n/P) * (tid+1) ; r++) {
+    			    		f(*(r+first));
+    			    	}
+    			    } else {
+    			    	for(size_t r = (n/P) * tid; r < n ; r++) {
+    			    		f(*(r+first));
+    			    	}
+    			    }
     			}
     		}
     }
