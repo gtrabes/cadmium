@@ -128,9 +128,9 @@ namespace cadmium {
             #else
 				#ifdef CPU_PARALLEL
             	template<typename TIME>
-            	void advance_simulation_in_subengines(TIME t, subcoordinators_type<TIME>& subcoordinators) {
+            	void advance_simulation_in_subengines(TIME t, subcoordinators_type<TIME>& subcoordinators, size_t thread_number) {
             		auto advance_time= [&t](auto &c)->void { c->advance_simulation(t); };
-            	    cadmium::parallel::cpu_parallel_for_each(subcoordinators.begin(), subcoordinators.end(), advance_time);
+            	    cadmium::parallel::cpu_parallel_for_each(subcoordinators.begin(), subcoordinators.end(), advance_time, thread_number);
             	}
 				#else
             	template<typename TIME>
@@ -155,9 +155,9 @@ namespace cadmium {
             #else
 				#ifdef CPU_PARALLEL
             	template<typename TIME>
-            	void collect_outputs_in_subcoordinators(TIME t, subcoordinators_type<TIME>& subcoordinators) {
+            	void collect_outputs_in_subcoordinators(TIME t, subcoordinators_type<TIME>& subcoordinators, size_t thread_number) {
             		auto collect_output = [&t](auto &c)->void { c->collect_outputs(t); };
-            	    cadmium::parallel::cpu_parallel_for_each(subcoordinators.begin(), subcoordinators.end(), collect_output);
+            	    cadmium::parallel::cpu_parallel_for_each(subcoordinators.begin(), subcoordinators.end(), collect_output, thread_number);
             	}
 				#else
             	template<typename TIME>

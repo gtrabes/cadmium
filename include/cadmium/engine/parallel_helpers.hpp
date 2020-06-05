@@ -37,7 +37,6 @@ namespace cadmium {
 
     		template< class InputIt, class UnaryFunction >
             void cpu_parallel_for_each(InputIt first, InputIt last, UnaryFunction& f, size_t thread_number = omp_get_num_threads()) {
-
     			#pragma omp parallel firstprivate(f, first, last) num_threads(thread_number) proc_bind(close)
     			{
     				const size_t n = std::distance(first, last);
@@ -45,37 +44,56 @@ namespace cadmium {
     				size_t P = thread_number;
 
     				if(tid!=P-1) {
-    					for(size_t r = (n/P) * tid; r < (n/P) * (tid+1) ; r++) {
-    						f(*(r+first));
+    					for(size_t i = (n/P) * tid; i < (n/P) * (tid+1) ; i++) {
+    						f(*(i+first));
     					}
     				} else {
-    					for(size_t r = (n/P) * tid; r < n ; r++) {
-    						f(*(r+first));
+    					for(size_t i = (n/P) * tid; i < n ; i++) {
+    						f(*(i+first));
     					}
     				}
     			}
     		}
 
-    		template< class InputIt, class UnaryFunction >
-    		void cpu_parallel_for_each2(InputIt first, InputIt last, UnaryFunction& f) {
-
-				#pragma omp parallel firstprivate(f, first, last) proc_bind(close)
+    		void create_omp_threads(size_t thread_number = omp_get_num_threads()) {
+				#pragma omp parallel num_threads(thread_number) proc_bind(close)
     			{
-    				const size_t n = std::distance(first, last);
-    			    int tid = omp_get_thread_num();
-    			    size_t P = omp_get_num_threads();
+    		}
 
-    			    if(tid!=P-1) {
-    			    	for(size_t r = (n/P) * tid; r < (n/P) * (tid+1) ; r++) {
-    			    		f(*(r+first));
-    			    	}
-    			    } else {
-    			    	for(size_t r = (n/P) * tid; r < n ; r++) {
-    			    		f(*(r+first));
-    			    	}
-    			    }
+    		void destroy_omp_threads() {
     			}
     		}
+
+    		void begin_omp_sequential_section() {
+    			#pragma omp master
+    		    {
+    		}
+
+    		void end_omp_sequential_section() {
+    			}
+    		}
+
+    		void omp_thread_synchronization() {
+				#pragma omp barrier
+    		}
+
+    		template< class InputIt, class UnaryFunction >
+    		void cpu_omp_parallel_for_each(InputIt first, InputIt last, UnaryFunction& f, size_t thread_number = omp_get_num_threads()) {
+    			const size_t n = std::distance(first, last);
+    		    int tid = omp_get_thread_num();
+    		    size_t P = thread_number;
+
+    		    if(tid!=P-1) {
+    		    	for(size_t i = (n/P) * tid; i < (n/P) * (tid+1) ; i++) {
+    		    		f(*(i+first));
+    		    	}
+    		    } else {
+    		    	for(size_t i = (n/P) * tid; i < n ; i++) {
+    		    		f(*(i+first));
+    		    	}
+    		    }
+    		}
+
     }
 }
 

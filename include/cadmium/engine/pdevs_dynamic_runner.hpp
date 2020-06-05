@@ -33,6 +33,10 @@
 #include <boost/thread/executors/basic_thread_pool.hpp>
 #endif //CADMIUM_EXECUTE_CONCURRENT
 
+#ifdef CADMIUM_EXECUTE_CONCURRENT
+#include <boost/thread/executors/basic_thread_pool.hpp>
+#endif //CADMIUM_EXECUTE_CONCURRENT
+
 namespace cadmium {
     namespace dynamic {
         namespace engine {
@@ -77,16 +81,24 @@ namespace cadmium {
                     _top_coordinator.init(init_time, &_threadpool);
                     _next = _top_coordinator.next();
                 }
-
                 #else
-
-                explicit runner(std::shared_ptr<cadmium::dynamic::modeling::coupled<TIME>> coupled_model, const TIME &init_time)
-                : _top_coordinator(coupled_model){
-                    LOGGER::template log<cadmium::logger::logger_global_time, cadmium::logger::run_global_time>(init_time);
-                    LOGGER::template log<cadmium::logger::logger_info, cadmium::logger::run_info>("Preparing model");
-                    _top_coordinator.init(init_time);
-                    _next = _top_coordinator.next();
-                }
+					#ifdef CPU_PARALLEL
+                	explicit runner(std::shared_ptr<cadmium::dynamic::modeling::coupled<TIME>> coupled_model, const TIME &init_time, unsigned const thread_count = boost::thread::hardware_concurrency())
+                    : _top_coordinator(coupled_model){
+                		LOGGER::template log<cadmium::logger::logger_global_time, cadmium::logger::run_global_time>(init_time);
+                		LOGGER::template log<cadmium::logger::logger_info, cadmium::logger::run_info>("Preparing model");
+                		_top_coordinator.init(init_time);
+                		_next = _top_coordinator.next();
+                    }
+					#else
+                	explicit runner(std::shared_ptr<cadmium::dynamic::modeling::coupled<TIME>> coupled_model, const TIME &init_time)
+                	: _top_coordinator(coupled_model){
+                		LOGGER::template log<cadmium::logger::logger_global_time, cadmium::logger::run_global_time>(init_time);
+                		LOGGER::template log<cadmium::logger::logger_info, cadmium::logger::run_info>("Preparing model");
+                		_top_coordinator.init(init_time);
+                		_next = _top_coordinator.next();
+                	}
+					#endif
                 #endif //CADMIUM_EXECUTE_CONCURRENT
                 
                 /**
