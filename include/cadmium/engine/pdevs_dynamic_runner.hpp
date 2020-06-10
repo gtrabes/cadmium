@@ -33,9 +33,10 @@
 #include <boost/thread/executors/basic_thread_pool.hpp>
 #endif //CADMIUM_EXECUTE_CONCURRENT
 
-#ifdef CADMIUM_EXECUTE_CONCURRENT
-#include <boost/thread/executors/basic_thread_pool.hpp>
-#endif //CADMIUM_EXECUTE_CONCURRENT
+#if defined CPU_PARALLEL_V1 || defined CPU_PARALLEL_V2
+#include <thread>
+#include <cadmium/engine/parallel_helpers.hpp>
+#endif //CPU_OMP_PARALLEL
 
 namespace cadmium {
     namespace dynamic {
@@ -66,6 +67,10 @@ namespace cadmium {
                 boost::basic_thread_pool _threadpool;
                 #endif //CADMIUM_EXECUTE_CONCURRENT
 
+                #if defined CPU_PARALLEL_V1 || defined CPU_PARALLEL_V2
+                size_t _thread_number;
+		#endif
+
             public:
                 //contructors
                 /**
@@ -82,15 +87,16 @@ namespace cadmium {
                     _next = _top_coordinator.next();
                 }
                 #else
-					#ifdef CPU_PARALLEL
-                	explicit runner(std::shared_ptr<cadmium::dynamic::modeling::coupled<TIME>> coupled_model, const TIME &init_time, unsigned const thread_count = boost::thread::hardware_concurrency())
-                    : _top_coordinator(coupled_model){
+			#if defined CPU_PARALLEL_V1 || defined CPU_PARALLEL_V2
+                	explicit runner(std::shared_ptr<cadmium::dynamic::modeling::coupled<TIME>> coupled_model, const TIME &init_time, unsigned const thread_number = std::thread::hardware_concurrency())
+                    	: _top_coordinator(coupled_model){
+                		_thread_number = thread_number;
                 		LOGGER::template log<cadmium::logger::logger_global_time, cadmium::logger::run_global_time>(init_time);
                 		LOGGER::template log<cadmium::logger::logger_info, cadmium::logger::run_info>("Preparing model");
-                		_top_coordinator.init(init_time);
+                		_top_coordinator.init(init_time, _thread_number);
                 		_next = _top_coordinator.next();
-                    }
-					#else
+                    	}
+			#else
                 	explicit runner(std::shared_ptr<cadmium::dynamic::modeling::coupled<TIME>> coupled_model, const TIME &init_time)
                 	: _top_coordinator(coupled_model){
                 		LOGGER::template log<cadmium::logger::logger_global_time, cadmium::logger::run_global_time>(init_time);
@@ -107,6 +113,12 @@ namespace cadmium {
                  * @return the TIME of the next event to happen when simulation stopped.
                  */
                 TIME run_until(const TIME &t) {
+
+					#ifdef CPU_PARALLEL_V2
+                		cadmium::parallel::create_omp_threads(_thread_number);
+                		cadmium::parallel::begin_omp_sequential_section();
+					#endif //CPU_PARALLEL_V2
+
                     LOGGER::template log<cadmium::logger::logger_info, cadmium::logger::run_info>("Starting run");
                     while (_next < t) {
                         LOGGER::template log<cadmium::logger::logger_global_time, cadmium::logger::run_global_time>(_next);
@@ -114,6 +126,12 @@ namespace cadmium {
                         _top_coordinator.advance_simulation(_next);
                         _next = _top_coordinator.next();
                     }
+
+					#ifdef CPU_PARALLEL_V2
+                    	cadmium::parallel::end_omp_sequential_section();
+                    	cadmium::parallel::destroy_omp_threads();
+					#endif //CPU_PARALLEL_V2
+
                     LOGGER::template log<cadmium::logger::logger_info, cadmium::logger::run_info>("Finished run");
                     return _next;
                 }

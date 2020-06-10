@@ -31,19 +31,23 @@
 #include <functional>
 #include <chrono>
 #include <omp.h>
+#include <thread>
 
 namespace cadmium {
     namespace parallel {
 
-    		template< class InputIt, class UnaryFunction >
-            void cpu_parallel_for_each(InputIt first, InputIt last, UnaryFunction& f, size_t thread_number = omp_get_num_threads()) {
-    			#pragma omp parallel firstprivate(f, first, last) num_threads(thread_number) proc_bind(close)
+	    template< class InputIt, class UnaryFunction >
+            void cpu_omp_parallel_for_each_v1(InputIt first, InputIt last, UnaryFunction& f, unsigned int thread_number = std::thread::hardware_concurrency()) {
+			//#pragma omp parallel firstprivate(f, first, last) num_threads(thread_number) proc_bind(close)
+			//{
+			const size_t n = std::distance(first, last);
+			
+			#pragma omp parallel private(f, first) num_threads(thread_number) proc_bind(close)
     			{
-    				const size_t n = std::distance(first, last);
     				int tid = omp_get_thread_num();
     				size_t P = thread_number;
 
-    				if(tid!=P-1) {
+    				if(tid != P-1) {
     					for(size_t i = (n/P) * tid; i < (n/P) * (tid+1) ; i++) {
     						f(*(i+first));
     					}
@@ -52,25 +56,35 @@ namespace cadmium {
     						f(*(i+first));
     					}
     				}
+
+/*			
+				#pragma omp for schedule(static)
+				//{
+					for(size_t i = 0; i < n ; i++) {
+						f(*(i+first));
+					}
+				//}
+*/
     			}
     		}
 
-    		void create_omp_threads(size_t thread_number = omp_get_num_threads()) {
+    		void create_omp_threads(size_t thread_number = std::thread::hardware_concurrency()) {
 				#pragma omp parallel num_threads(thread_number) proc_bind(close)
     			{
+    			}
     		}
 
     		void destroy_omp_threads() {
-    			}
+    			//}
     		}
 
     		void begin_omp_sequential_section() {
-    			#pragma omp master
-    		    {
+    			//#pragma omp master
+    		    //{
     		}
 
     		void end_omp_sequential_section() {
-    			}
+    			//}
     		}
 
     		void omp_thread_synchronization() {
@@ -78,12 +92,16 @@ namespace cadmium {
     		}
 
     		template< class InputIt, class UnaryFunction >
-    		void cpu_omp_parallel_for_each(InputIt first, InputIt last, UnaryFunction& f, size_t thread_number = omp_get_num_threads()) {
+    		void cpu_omp_parallel_for_each_v2(InputIt first, InputIt last, UnaryFunction& f, size_t thread_number = std::thread::hardware_concurrency()) {
+
+    			end_omp_sequential_section();
+    			omp_thread_synchronization();
+
     			const size_t n = std::distance(first, last);
     		    int tid = omp_get_thread_num();
     		    size_t P = thread_number;
 
-    		    if(tid!=P-1) {
+    		    if(tid != P-1) {
     		    	for(size_t i = (n/P) * tid; i < (n/P) * (tid+1) ; i++) {
     		    		f(*(i+first));
     		    	}
@@ -92,6 +110,21 @@ namespace cadmium {
     		    		f(*(i+first));
     		    	}
     		    }
+
+    		    omp_thread_synchronization();
+    		    begin_omp_sequential_section();
+
+    		}
+
+    		template< class InputIt, class UnaryFunction >
+    		void cpu_parallel_for_each(InputIt first, InputIt last, UnaryFunction& f, size_t thread_number = std::thread::hardware_concurrency()) {
+			#ifdef CPU_PARALLEL_V1
+    			cpu_omp_parallel_for_each_v1(first, last, f, thread_number);
+			#else
+				#ifdef CPU_PARALLEL_V2
+    				cpu_omp_parallel_for_each_v1(first, last, f, thread_number);
+				#endif
+			#endif
     		}
 
     }

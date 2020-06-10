@@ -52,6 +52,10 @@ namespace cadmium {
                 virtual void init(TIME initial_time, boost::basic_thread_pool* threadpool) = 0;
                 #endif
 
+		#if defined CPU_PARALLEL_V1 || defined CPU_PARALLEL_V2
+                virtual void init(TIME initial_time, size_t thread_number) = 0;
+                #endif
+
                 virtual std::string get_model_id() const = 0;
 
                 virtual TIME next() const noexcept = 0;
