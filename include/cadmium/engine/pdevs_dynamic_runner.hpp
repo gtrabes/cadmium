@@ -115,8 +115,8 @@ namespace cadmium {
                 TIME run_until(const TIME &t) {
 
 					#ifdef CPU_PARALLEL_V2
-                		cadmium::parallel::create_omp_threads(_thread_number);
-                		cadmium::parallel::begin_omp_sequential_section();
+                		//cadmium::parallel::create_omp_threads(_thread_number);
+                		//cadmium::parallel::begin_omp_sequential_section();
 					#endif //CPU_PARALLEL_V2
 
                     LOGGER::template log<cadmium::logger::logger_info, cadmium::logger::run_info>("Starting run");
@@ -128,8 +128,8 @@ namespace cadmium {
                     }
 
 					#ifdef CPU_PARALLEL_V2
-                    	cadmium::parallel::end_omp_sequential_section();
-                    	cadmium::parallel::destroy_omp_threads();
+                    	//cadmium::parallel::end_omp_sequential_section();
+                    	//cadmium::parallel::destroy_omp_threads();
 					#endif //CPU_PARALLEL_V2
 
                     LOGGER::template log<cadmium::logger::logger_info, cadmium::logger::run_info>("Finished run");

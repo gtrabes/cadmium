@@ -41,8 +41,10 @@ namespace cadmium {
 			//#pragma omp parallel firstprivate(f, first, last) num_threads(thread_number) proc_bind(close)
 			//{
 			const size_t n = std::distance(first, last);
-			
-			#pragma omp parallel private(f, first) num_threads(thread_number) proc_bind(close)
+
+			//thread_number=6;
+
+			#pragma omp parallel firstprivate(f, first) num_threads(thread_number) proc_bind(close)
     			{
     				int tid = omp_get_thread_num();
     				size_t P = thread_number;
@@ -116,13 +118,40 @@ namespace cadmium {
 
     		}
 
+    		template<typename ITERATOR, typename FUNC>
+    		void parallel_for_each_iterator(ITERATOR first, ITERATOR last, FUNC& f, unsigned int thread_number){
+    			/* set number of threads */
+    			//omp_set_num_threads(thread_number);
+    			size_t n = std::distance(first, last);
+
+    			#pragma omp parallel for num_threads(thread_number) firstprivate(f, first)
+    			for(int i = 0; i < n; i++){
+    				f(*(i+first));
+    			}
+
+    		//		#pragma omp parallel for firstprivate(f) shared(first,last)
+    		//    	for (ITERATOR it = first; it != last; it++) {
+    		//    		f(*it);
+    		//    	}
+
+    		//		#pragma omp parallel for firstprivate(f) shared(first)
+    		//		for(size_t i = 0; i < n; i++){
+    		//			auto& elem = *(first + i);
+    					// do whatever you want with elem
+    		//			f(elem);
+    		//		}
+    		}
+
+
+
+
     		template< class InputIt, class UnaryFunction >
     		void cpu_parallel_for_each(InputIt first, InputIt last, UnaryFunction& f, size_t thread_number = std::thread::hardware_concurrency()) {
 			#ifdef CPU_PARALLEL
     			cpu_omp_parallel_for_each_v1(first, last, f, thread_number);
 			#else
 				#ifdef CPU_PARALLEL_V2
-    				cpu_omp_parallel_for_each_v1(first, last, f, thread_number);
+    				parallel_for_each_iterator(first, last, f, thread_number);
 				#endif
 			#endif
     		}
