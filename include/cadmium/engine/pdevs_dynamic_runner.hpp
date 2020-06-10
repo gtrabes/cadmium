@@ -87,7 +87,7 @@ namespace cadmium {
                     _next = _top_coordinator.next();
                 }
                 #else
-			#if defined CPU_PARALLEL || defined CPU_PARALLEL_V2
+					#if defined CPU_PARALLEL || defined CPU_PARALLEL_V2
                 	explicit runner(std::shared_ptr<cadmium::dynamic::modeling::coupled<TIME>> coupled_model, const TIME &init_time, unsigned const thread_number = std::thread::hardware_concurrency())
                     	: _top_coordinator(coupled_model){
                 		_thread_number = thread_number;
@@ -96,7 +96,7 @@ namespace cadmium {
                 		_top_coordinator.init(init_time, _thread_number);
                 		_next = _top_coordinator.next();
                     	}
-			#else
+					#else
                 	explicit runner(std::shared_ptr<cadmium::dynamic::modeling::coupled<TIME>> coupled_model, const TIME &init_time)
                 	: _top_coordinator(coupled_model){
                 		LOGGER::template log<cadmium::logger::logger_global_time, cadmium::logger::run_global_time>(init_time);
@@ -114,10 +114,11 @@ namespace cadmium {
                  */
                 TIME run_until(const TIME &t) {
 
-					#ifdef CPU_PARALLEL_V2
+					#ifdef CPU_PARALLEL
+                		cadmium::parallel::set_affinity_to_cpu_0();
                 		//cadmium::parallel::create_omp_threads(_thread_number);
                 		//cadmium::parallel::begin_omp_sequential_section();
-					#endif //CPU_PARALLEL_V2
+					#endif //CPU_PARALLEL
 
                     LOGGER::template log<cadmium::logger::logger_info, cadmium::logger::run_info>("Starting run");
                     while (_next < t) {
@@ -127,10 +128,10 @@ namespace cadmium {
                         _next = _top_coordinator.next();
                     }
 
-					#ifdef CPU_PARALLEL_V2
+					//#ifdef CPU_PARALLEL_V2
                     	//cadmium::parallel::end_omp_sequential_section();
                     	//cadmium::parallel::destroy_omp_threads();
-					#endif //CPU_PARALLEL_V2
+					//#endif //CPU_PARALLEL_V2
 
                     LOGGER::template log<cadmium::logger::logger_info, cadmium::logger::run_info>("Finished run");
                     return _next;

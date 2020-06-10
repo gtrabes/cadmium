@@ -244,7 +244,8 @@ namespace cadmium {
                         cadmium::dynamic::engine::collect_outputs_in_subcoordinators<TIME>(t, _subcoordinators, _threadpool);
                         #else
 							#if defined CPU_PARALLEL || defined CPU_PARALLEL_V2
-                        		cadmium::dynamic::engine::collect_outputs_in_subcoordinators<TIME>(t, _subcoordinators, _thread_number);
+                        		//cadmium::dynamic::engine::collect_outputs_in_subcoordinators<TIME>(t, _subcoordinators, _thread_number);
+                        		cadmium::dynamic::engine::collect_outputs_in_subcoordinators<TIME>(t, _subcoordinators);
 							#else
                         		cadmium::dynamic::engine::collect_outputs_in_subcoordinators<TIME>(t, _subcoordinators);
 							#endif
@@ -296,7 +297,8 @@ namespace cadmium {
                         cadmium::dynamic::engine::advance_simulation_in_subengines<TIME>(t, _subcoordinators, _threadpool);
                         #else
 							#if defined CPU_PARALLEL || defined CPU_PARALLEL_V2
-                        		cadmium::dynamic::engine::advance_simulation_in_subengines<TIME>(t, _subcoordinators, _thread_number);
+                        		//cadmium::dynamic::engine::advance_simulation_in_subengines<TIME>(t, _subcoordinators, _thread_number);
+                        		cadmium::dynamic::engine::advance_simulation_in_subengines<TIME>(t, _subcoordinators);
 							#else
                         		cadmium::dynamic::engine::advance_simulation_in_subengines<TIME>(t, _subcoordinators);
 							#endif
