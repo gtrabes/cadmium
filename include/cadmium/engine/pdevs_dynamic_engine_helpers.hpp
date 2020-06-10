@@ -138,8 +138,8 @@ namespace cadmium {
             	template<typename TIME>
             	void advance_simulation_in_subengines(TIME t, subcoordinators_type<TIME>& subcoordinators, size_t thread_number) {
             		auto advance_time= [&t](auto &c)->void { c->advance_simulation(t); };
-            		cadmium::parallel::cpu_parallel_for_each(subcoordinators.begin(), subcoordinators.end(), advance_time, thread_number);
-            		//std::for_each(subcoordinators.begin(), subcoordinators.end(), advance_time);
+            		cadmium::parallel::cpu_omp_parallel_for_each_v1(subcoordinators.begin(), subcoordinators.end(), advance_time, thread_number);
+//			std::for_each(subcoordinators.begin(), subcoordinators.end(), advance_time);
             	}
 				#else
             	template<typename TIME>
