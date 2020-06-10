@@ -49,7 +49,7 @@ endif ()
 enable_testing()
 
 #run all tests for sequential and concurrent versions
-set(EXEC_TYPES "seq" "par")
+set(EXEC_TYPES "seq" "conc" "par")
 foreach (exec_type ${EXEC_TYPES})
     # Unit tests
     FILE(GLOB TestSources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} test/*_test.cpp)
@@ -57,8 +57,11 @@ foreach (exec_type ${EXEC_TYPES})
         get_filename_component(testName ${testSrc} NAME_WE)
         set(testName "${testName}_${exec_type}")
         add_executable(${testName} test/main-test.cpp ${testSrc})
-        if (exec_type STREQUAL "par")
+        if (exec_type STREQUAL "conc")
             target_compile_definitions(${testName} PUBLIC CADMIUM_EXECUTE_CONCURRENT)
+        endif ()
+        if (exec_type STREQUAL "par")
+            target_compile_definitions(${testName} PUBLIC CPU_PARALLEL)
         endif ()
         target_link_libraries(${testName} PUBLIC ${Boost_LIBRARIES})
         add_test(${testName} ${testName})
@@ -73,8 +76,11 @@ foreach (exec_type ${EXEC_TYPES})
         set_target_properties(${testCompName} PROPERTIES
                 EXCLUDE_FROM_ALL TRUE
                 EXCLUDE_FROM_DEFAULT_BUILD TRUE)
-        if (exec_type STREQUAL "par")
+        if (exec_type STREQUAL "conc")
             target_compile_definitions(${testCompName} PUBLIC CADMIUM_EXECUTE_CONCURRENT)
+        endif ()
+        if (exec_type STREQUAL "par")
+            target_compile_definitions(${testCompName} PUBLIC CPU_PARALLEL)
         endif ()
         target_include_directories(${testCompName} PUBLIC test-compile/compiles)
         add_test(NAME ${testCompName}
@@ -91,8 +97,11 @@ foreach (exec_type ${EXEC_TYPES})
         set_target_properties(${testCmpFailName} PROPERTIES
                 EXCLUDE_FROM_ALL TRUE
                 EXCLUDE_FROM_DEFAULT_BUILD TRUE)
-        if (exec_type STREQUAL "par")
+        if (exec_type STREQUAL "conc")
             target_compile_definitions(${testCmpFailName} PUBLIC CADMIUM_EXECUTE_CONCURRENT)
+        endif ()
+        if (exec_type STREQUAL "par")
+            target_compile_definitions(${testCmpFailName} PUBLIC CPU_PARALLEL)
         endif ()
         add_test(NAME ${testCmpFailName}
                 COMMAND ${CMAKE_COMMAND} --build . --target ${testCmpFailName}
