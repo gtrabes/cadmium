@@ -33,7 +33,7 @@
 #include <boost/thread/executors/basic_thread_pool.hpp>
 #endif //CADMIUM_EXECUTE_CONCURRENT
 
-#if defined CPU_PARALLEL_V1 || defined CPU_PARALLEL_V2
+#if defined CPU_PARALLEL || defined CPU_PARALLEL_V2
 #include <thread>
 #include <cadmium/engine/parallel_helpers.hpp>
 #endif //CPU_OMP_PARALLEL
@@ -67,7 +67,7 @@ namespace cadmium {
                 boost::basic_thread_pool _threadpool;
                 #endif //CADMIUM_EXECUTE_CONCURRENT
 
-                #if defined CPU_PARALLEL_V1 || defined CPU_PARALLEL_V2
+                #if defined CPU_PARALLEL || defined CPU_PARALLEL_V2
                 size_t _thread_number;
 		#endif
 
@@ -87,7 +87,7 @@ namespace cadmium {
                     _next = _top_coordinator.next();
                 }
                 #else
-			#if defined CPU_PARALLEL_V1 || defined CPU_PARALLEL_V2
+			#if defined CPU_PARALLEL || defined CPU_PARALLEL_V2
                 	explicit runner(std::shared_ptr<cadmium::dynamic::modeling::coupled<TIME>> coupled_model, const TIME &init_time, unsigned const thread_number = std::thread::hardware_concurrency())
                     	: _top_coordinator(coupled_model){
                 		_thread_number = thread_number;

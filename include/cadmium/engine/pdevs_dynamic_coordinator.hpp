@@ -57,9 +57,9 @@ namespace cadmium {
                 boost::basic_thread_pool* _threadpool;
                 #endif //CADMIUM_EXECUTE_CONCURRENT
 
-		#if defined CPU_PARALLEL_V1 || defined CPU_PARALLEL_V2
+				#if defined CPU_PARALLEL || defined CPU_PARALLEL_V2
                 size_t _thread_number;
-		#endif //CPU_PARALLEL || CPU_OMP_PARALLEL
+				#endif //CPU_PARALLEL
 
             public:
 
@@ -186,11 +186,11 @@ namespace cadmium {
                     #ifdef CADMIUM_EXECUTE_CONCURRENT
                     cadmium::dynamic::engine::init_subcoordinators<TIME>(initial_time, _subcoordinators, _threadpool);
                     #else
-			#if defined CPU_PARALLEL_V1 || defined CPU_PARALLEL_V2
-			cadmium::dynamic::engine::init_subcoordinators<TIME>(initial_time, _subcoordinators, _thread_number);
-			#else
+						#if defined CPU_PARALLEL || defined CPU_PARALLEL_V2
+                    	cadmium::dynamic::engine::init_subcoordinators<TIME>(initial_time, _subcoordinators, _thread_number);
+						#else
                     	cadmium::dynamic::engine::init_subcoordinators<TIME>(initial_time, _subcoordinators);
-			#endif
+						#endif
                     #endif //CADMIUM_EXECUTE_CONCURRENT
 
                     //find the one with the lowest next time
@@ -204,13 +204,12 @@ namespace cadmium {
                 }
                 #endif //CADMIUM_EXECUTE_CONCURRENT
 
-		#if defined CPU_PARALLEL_V1 || defined CPU_PARALLEL_V2
+				#if defined CPU_PARALLEL || defined CPU_PARALLEL_V2
                 void init(TIME initial_time, size_t thread_number) {
                     _thread_number = thread_number;
                     this->init(initial_time);
                 }
                 #endif //CPU_PARALLEL
-
 
                 std::string get_model_id() const override {
                     return _model_id;
@@ -244,11 +243,11 @@ namespace cadmium {
                         #ifdef CADMIUM_EXECUTE_CONCURRENT
                         cadmium::dynamic::engine::collect_outputs_in_subcoordinators<TIME>(t, _subcoordinators, _threadpool);
                         #else
-				#if defined CPU_PARALLEL_V1 || defined CPU_PARALLEL_V2
-                        	cadmium::dynamic::engine::collect_outputs_in_subcoordinators<TIME>(t, _subcoordinators, _thread_number);
-				#else
-                        	cadmium::dynamic::engine::collect_outputs_in_subcoordinators<TIME>(t, _subcoordinators);
-				#endif
+							#if defined CPU_PARALLEL || defined CPU_PARALLEL_V2
+                        		cadmium::dynamic::engine::collect_outputs_in_subcoordinators<TIME>(t, _subcoordinators, _thread_number);
+							#else
+                        		cadmium::dynamic::engine::collect_outputs_in_subcoordinators<TIME>(t, _subcoordinators);
+							#endif
                         #endif
 
                         // Use the EOC mapping to compose current level output
@@ -296,11 +295,11 @@ namespace cadmium {
                         #ifdef CADMIUM_EXECUTE_CONCURRENT
                         cadmium::dynamic::engine::advance_simulation_in_subengines<TIME>(t, _subcoordinators, _threadpool);
                         #else
-				#if defined CPU_PARALLEL_V1 || defined CPU_PARALLEL_V2
-                        	cadmium::dynamic::engine::advance_simulation_in_subengines<TIME>(t, _subcoordinators, _thread_number);
-				#else
-                        	cadmium::dynamic::engine::advance_simulation_in_subengines<TIME>(t, _subcoordinators);
-				#endif
+							#if defined CPU_PARALLEL || defined CPU_PARALLEL_V2
+                        		cadmium::dynamic::engine::advance_simulation_in_subengines<TIME>(t, _subcoordinators, _thread_number);
+							#else
+                        		cadmium::dynamic::engine::advance_simulation_in_subengines<TIME>(t, _subcoordinators);
+							#endif
                         #endif
 
                         //set _last and _next
@@ -317,4 +316,3 @@ namespace cadmium {
 }
 
 #endif //CADMIUM_PDEVS_DYNAMIC_COORDINATOR_HPP
-

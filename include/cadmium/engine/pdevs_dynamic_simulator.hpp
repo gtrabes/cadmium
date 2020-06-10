@@ -79,7 +79,7 @@ namespace cadmium {
                 }
                 #endif //CADMIUM_EXECUTE_CONCURRENT
 
-		#if defined CPU_PARALLEL_V1 || defined CPU_PARALLEL_V2
+				#if defined CPU_PARALLEL || defined CPU_PARALLEL_V2
                 void init(TIME initial_time, size_t thread_number) {
                     this->init(initial_time);
                 }

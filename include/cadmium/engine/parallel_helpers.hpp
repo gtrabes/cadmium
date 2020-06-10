@@ -118,7 +118,7 @@ namespace cadmium {
 
     		template< class InputIt, class UnaryFunction >
     		void cpu_parallel_for_each(InputIt first, InputIt last, UnaryFunction& f, size_t thread_number = std::thread::hardware_concurrency()) {
-			#ifdef CPU_PARALLEL_V1
+			#ifdef CPU_PARALLEL
     			cpu_omp_parallel_for_each_v1(first, last, f, thread_number);
 			#else
 				#ifdef CPU_PARALLEL_V2
