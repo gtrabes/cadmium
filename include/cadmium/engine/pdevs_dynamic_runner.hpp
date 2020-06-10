@@ -33,7 +33,7 @@
 #include <boost/thread/executors/basic_thread_pool.hpp>
 #endif //CADMIUM_EXECUTE_CONCURRENT
 
-#if defined CPU_PARALLEL || defined CPU_PARALLEL_V2
+#if defined CPU_PARALLEL
 #include <thread>
 #include <cadmium/engine/parallel_helpers.hpp>
 #endif //CPU_OMP_PARALLEL
@@ -67,7 +67,7 @@ namespace cadmium {
                 boost::basic_thread_pool _threadpool;
                 #endif //CADMIUM_EXECUTE_CONCURRENT
 
-                #if defined CPU_PARALLEL || defined CPU_PARALLEL_V2
+                #if defined CPU_PARALLEL
                 size_t _thread_number;
 		#endif
 
@@ -87,7 +87,7 @@ namespace cadmium {
                     _next = _top_coordinator.next();
                 }
                 #else
-			#if defined CPU_PARALLEL || defined CPU_PARALLEL_V2
+					#if defined CPU_PARALLEL
                 	explicit runner(std::shared_ptr<cadmium::dynamic::modeling::coupled<TIME>> coupled_model, const TIME &init_time, unsigned const thread_number = std::thread::hardware_concurrency())
                     	: _top_coordinator(coupled_model){
                 		_thread_number = thread_number;
@@ -96,7 +96,7 @@ namespace cadmium {
                 		_top_coordinator.init(init_time, _thread_number);
                 		_next = _top_coordinator.next();
                     	}
-			#else
+					#else
                 	explicit runner(std::shared_ptr<cadmium::dynamic::modeling::coupled<TIME>> coupled_model, const TIME &init_time)
                 	: _top_coordinator(coupled_model){
                 		LOGGER::template log<cadmium::logger::logger_global_time, cadmium::logger::run_global_time>(init_time);
@@ -114,11 +114,6 @@ namespace cadmium {
                  */
                 TIME run_until(const TIME &t) {
 
-					#ifdef CPU_PARALLEL_V2
-                		//cadmium::parallel::create_omp_threads(_thread_number);
-                		//cadmium::parallel::begin_omp_sequential_section();
-					#endif //CPU_PARALLEL_V2
-
                     LOGGER::template log<cadmium::logger::logger_info, cadmium::logger::run_info>("Starting run");
                     while (_next < t) {
                         LOGGER::template log<cadmium::logger::logger_global_time, cadmium::logger::run_global_time>(_next);
@@ -126,11 +121,6 @@ namespace cadmium {
                         _top_coordinator.advance_simulation(_next);
                         _next = _top_coordinator.next();
                     }
-
-					#ifdef CPU_PARALLEL_V2
-                    	//cadmium::parallel::end_omp_sequential_section();
-                    	//cadmium::parallel::destroy_omp_threads();
-					#endif //CPU_PARALLEL_V2
 
                     LOGGER::template log<cadmium::logger::logger_info, cadmium::logger::run_info>("Finished run");
                     return _next;

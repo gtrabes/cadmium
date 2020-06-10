@@ -57,7 +57,7 @@ namespace cadmium {
                 boost::basic_thread_pool* _threadpool;
                 #endif //CADMIUM_EXECUTE_CONCURRENT
 
-				#if defined CPU_PARALLEL || defined CPU_PARALLEL_V2
+				#if defined CPU_PARALLEL
                 size_t _thread_number;
 				#endif //CPU_PARALLEL
 
@@ -186,7 +186,7 @@ namespace cadmium {
                     #ifdef CADMIUM_EXECUTE_CONCURRENT
                     cadmium::dynamic::engine::init_subcoordinators<TIME>(initial_time, _subcoordinators, _threadpool);
                     #else
-						#if defined CPU_PARALLEL || defined CPU_PARALLEL_V2
+						#if defined CPU_PARALLEL
                     	cadmium::dynamic::engine::init_subcoordinators<TIME>(initial_time, _subcoordinators, _thread_number);
 						#else
                     	cadmium::dynamic::engine::init_subcoordinators<TIME>(initial_time, _subcoordinators);
@@ -204,7 +204,7 @@ namespace cadmium {
                 }
                 #endif //CADMIUM_EXECUTE_CONCURRENT
 
-				#if defined CPU_PARALLEL || defined CPU_PARALLEL_V2
+				#if defined CPU_PARALLEL
                 void init(TIME initial_time, size_t thread_number) {
                     _thread_number = thread_number;
                     this->init(initial_time);
@@ -243,7 +243,7 @@ namespace cadmium {
                         #ifdef CADMIUM_EXECUTE_CONCURRENT
                         cadmium::dynamic::engine::collect_outputs_in_subcoordinators<TIME>(t, _subcoordinators, _threadpool);
                         #else
-							#if defined CPU_PARALLEL || defined CPU_PARALLEL_V2
+							#if defined CPU_PARALLEL
                         		cadmium::dynamic::engine::collect_outputs_in_subcoordinators<TIME>(t, _subcoordinators, _thread_number);
 							#else
                         		cadmium::dynamic::engine::collect_outputs_in_subcoordinators<TIME>(t, _subcoordinators);
@@ -295,7 +295,7 @@ namespace cadmium {
                         #ifdef CADMIUM_EXECUTE_CONCURRENT
                         cadmium::dynamic::engine::advance_simulation_in_subengines<TIME>(t, _subcoordinators, _threadpool);
                         #else
-							#if defined CPU_PARALLEL || defined CPU_PARALLEL_V2
+							#if defined CPU_PARALLEL
                         		cadmium::dynamic::engine::advance_simulation_in_subengines<TIME>(t, _subcoordinators, _thread_number);
 							#else
                         		cadmium::dynamic::engine::advance_simulation_in_subengines<TIME>(t, _subcoordinators);
