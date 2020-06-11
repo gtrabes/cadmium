@@ -45,11 +45,31 @@ namespace cadmium {
     			thread_number=n;
     		}
     		/* OpenMP parallel loop */
+    		/* It doesn't work -> execution time as sequential version
     		#pragma omp parallel for num_threads(thread_number) firstprivate(f, first) proc_bind(close) schedule(static)
     		for(int i = 0; i < n; i++){
     			f(*(i+first));
     		}
+    		*/
+			#pragma omp parallel firstprivate(f) num_threads(thread_number) proc_bind(close)
+    		{
+    			/* get thread id */
+    			int tid = omp_get_thread_num();
+
+    			/* if it's not last thread compute n/thread_number elements */
+    			if(tid != thread_number-1) {
+    				for(size_t i = (n/thread_number)*tid; i < (n/thread_number)*(tid+1); i++) {
+    					f(*(i+first));
+    				}
+    			/* if it's last thread compute till the end of the vector */
+				} else {
+					for(size_t i = (n/thread_number) * tid; i < n ; i++) {
+						f(*(i+first));
+					}
+				}
+    		}
     	}
+
     }
 }
 
