@@ -32,12 +32,14 @@
 #include <chrono>
 #include <omp.h>
 #include <thread>
+#include <algorithm>
+#include <array>
 
 namespace cadmium {
     namespace parallel {
 
     	template<typename ITERATOR, typename FUNC>
-    	void parallel_for_each(ITERATOR first, ITERATOR last, FUNC& f, unsigned int thread_number){
+    	void parallel_for_each(ITERATOR first, ITERATOR last, FUNC& f, size_t thread_number = std::thread::hardware_concurrency()){
     		/* get amount of elements to compute */
     		size_t n = std::distance(first, last);
     		/* if the amount of elements is less than the number of threads execute on n elements */
@@ -54,7 +56,7 @@ namespace cadmium {
 			#pragma omp parallel firstprivate(f) num_threads(thread_number) proc_bind(close)
     		{
     			/* get thread id */
-    			int tid = omp_get_thread_num();
+    			size_t tid = omp_get_thread_num();
 
     			/* if it's not last thread compute n/thread_number elements */
     			if(tid != thread_number-1) {
@@ -68,6 +70,50 @@ namespace cadmium {
 					}
 				}
     		}
+    	}
+
+    	template<class ForwardIt>
+    	ForwardIt parallel_min_element(ForwardIt first, ForwardIt last, unsigned long thread_number = std::thread::hardware_concurrency()) {
+
+    		if (first == last) return first;
+    		ForwardIt result=first;
+    		size_t n = std::distance(first, last);
+
+    		/* if the amount of elements is less than the number of threads execute on n elements */
+    		if(n<thread_number){
+    			thread_number=n;
+    		}
+
+			#pragma omp parallel shared(result) firstprivate(first, last) num_threads(thread_number) proc_bind(close)
+    		{
+    			ForwardIt start, end, smallest;
+    			/* get thread id */
+    			size_t tid = omp_get_thread_num();
+    			/* calculate number of elements to compute */
+    			size_t local_n = n/thread_number;
+    			/* calculate start position */
+    			start = first+(tid*local_n);
+    			/* calculate end position */
+    			if(tid != (thread_number-1)){
+    				end = start+local_n;
+    			}else{
+    				end = last;
+    			}
+
+    			/* each thread computes partial result */
+    			smallest = std::min_element(start, end);
+
+    			/* calculate final result from partial_results sequentially */
+				#pragma omp critical
+    			{
+    				if(*smallest < *result){
+    					result = smallest;
+    				}
+    			}
+
+    		}
+
+    		return result;
     	}
 
     }

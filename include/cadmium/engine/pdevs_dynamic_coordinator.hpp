@@ -194,7 +194,11 @@ namespace cadmium {
                     #endif //CADMIUM_EXECUTE_CONCURRENT
 
                     //find the one with the lowest next time
+					//#ifdef CPU_PARALLEL
+                    //_next = cadmium::dynamic::engine::min_next_in_subcoordinators<TIME>(_subcoordinators, _thread_number);
+					//#else
                     _next = cadmium::dynamic::engine::min_next_in_subcoordinators<TIME>(_subcoordinators);
+					//#endif
                 }
 
                 #ifdef CADMIUM_EXECUTE_CONCURRENT
@@ -304,7 +308,12 @@ namespace cadmium {
 
                         //set _last and _next
                         _last = t;
-                        _next = cadmium::dynamic::engine::min_next_in_subcoordinators<TIME>(_subcoordinators);
+						#ifdef CPU_PARALLEL
+                        	_next = cadmium::dynamic::engine::min_next_in_subcoordinators<TIME>(_subcoordinators, _thread_number);
+                        	//_next = cadmium::dynamic::engine::min_next_in_subcoordinators<TIME>(_subcoordinators);
+						#else
+                        	_next = cadmium::dynamic::engine::min_next_in_subcoordinators<TIME>(_subcoordinators);
+						#endif
 
                         //clean inbox because they were processed already
                         _inbox = cadmium::dynamic::message_bags();

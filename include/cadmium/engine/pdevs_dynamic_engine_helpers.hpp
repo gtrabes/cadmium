@@ -38,6 +38,7 @@
 
 #if defined CPU_PARALLEL
 #include <cadmium/engine/parallel_helpers.hpp>
+#include <algorithm>
 #endif //CPU_PARALLEL
 
 
@@ -221,6 +222,21 @@ namespace cadmium {
                 std::for_each(coupling.begin(), coupling.end(), route_messages);
             }
 
+			#ifdef CPU_PARALLEL
+            template<typename TIME>
+            TIME min_next_in_subcoordinators(const subcoordinators_type<TIME>& subcoordinators, size_t thread_number) {
+            	std::vector<TIME> next_times(subcoordinators.size());
+            	std::transform(
+            			subcoordinators.cbegin(),
+						subcoordinators.cend(),
+						next_times.begin(),
+						[] (const auto& c) -> TIME { return c->next(); }
+            	);
+            	return *cadmium::parallel::parallel_min_element(next_times.begin(), next_times.end(), thread_number);
+            	//return *std::min_element(next_times.begin(), next_times.end());
+            	//return *next_times.begin();
+            }
+			#endif
             template<typename TIME>
             TIME min_next_in_subcoordinators(const subcoordinators_type<TIME>& subcoordinators) {
                 std::vector<TIME> next_times(subcoordinators.size());
@@ -232,6 +248,8 @@ namespace cadmium {
                 );
                 return *std::min_element(next_times.begin(), next_times.end());
             }
+			//#endif
+
         }
     }
 }
